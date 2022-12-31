@@ -36,7 +36,6 @@ fun AnimatedVisibilityScope.NotesListScreen(
     navController: NavHostController,
     viewModel: NotesViewModel = hiltViewModel()
 ) {
-    val showMenu = remember { mutableStateOf(false) }
     val showTypeList = remember { mutableStateOf(ListShowType.Grid) }
     val noteListState = viewModel.notesState.collectAsState()
     val selectedItems = viewModel.selectedNotesState.collectAsState().value
@@ -57,9 +56,9 @@ fun AnimatedVisibilityScope.NotesListScreen(
             }
         },
         backgroundColor = MaterialTheme.colors.background
-    ) {
-        Box(modifier = Modifier.padding(vertical = 8.dp)) {
-            if (noteListState.value.isNullOrEmpty()) {
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            if (noteListState.value.isEmpty()) {
                 EmptyScreen()
             } else {
                 NotesListView(noteListState.value, showTypeList.value, NoteListItemState(
@@ -91,7 +90,7 @@ fun NoteListScreenAppBar(
 ) {
     TopAppBar(
         title = {
-            Text(text = "To-Do App")
+            Text(text = "Note App")
         },
         actions = {
             IconButton(onClick = {
@@ -107,29 +106,10 @@ fun NoteListScreenAppBar(
                     Icon(Icons.Default.GridView, null)
                 }
             }
-            // TODO enable this after implement retrofit
-            /*IconButton(onClick = { showMenu.value = !showMenu.value }) {
-                Icon(Icons.Default.MoreVert, null)
+            IconButton(onClick = {
+            }) {
+                Icon(Icons.Default.Sync, null)
             }
-            DropdownMenu(expanded = showMenu.value,
-                onDismissRequest = { showMenu.value = false }) {
-                DropdownMenuItem(onClick = {
-                    showMenu.value = false
-                }) {
-                    Text(
-                        text = "Mark all as completed",
-                        style = MaterialTheme.typography.caption
-                    )
-                }
-                DropdownMenuItem(onClick = {
-                    showMenu.value = false
-                }) {
-                    Text(
-                        text = "Sync with Remote DB",
-                        style = MaterialTheme.typography.caption
-                    )
-                }
-            }*/
         }
     )
 

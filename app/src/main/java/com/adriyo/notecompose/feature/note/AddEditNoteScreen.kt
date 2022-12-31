@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -20,10 +19,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.adriyo.notecompose.shared.components.TransparentTextField
 import kotlinx.coroutines.flow.collectLatest
 
@@ -32,8 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 @ExperimentalComposeUiApi
 @Composable
 fun AddEditNoteScreen(
-    navController: NavController,
-    viewModel: AddEditNoteViewModel = hiltViewModel()
+    navController: NavController, viewModel: AddEditNoteViewModel = hiltViewModel()
 ) {
     AnimatedVisibility(
         visible = true,
@@ -62,75 +58,61 @@ fun AddEditNoteScreenContent(navController: NavController, viewModel: AddEditNot
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController.navigateUp()
-                    }) {
-                        Icon(Icons.Default.ArrowBack, null)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.saveNote()
-                    }) {
-                        Icon(Icons.Default.Check, null)
-                    }
+            TopAppBar(title = {}, navigationIcon = {
+                IconButton(onClick = {
+                    navController.navigateUp()
+                }) {
+                    Icon(Icons.Default.ArrowBack, null)
                 }
-            )
+            }, actions = {
+                IconButton(onClick = {
+                    viewModel.saveNote()
+                }) {
+                    Icon(Icons.Default.Check, null)
+                }
+            })
         },
         backgroundColor = MaterialTheme.colors.background,
-    ) {
-        FormInput(titleState.text, noteState.text,
-            onTitleChange = {
-                viewModel.onTitleValueChange(it)
-            },
-            onNoteChange = {
-                viewModel.onNoteContentValueChange(it)
-            })
+    ) { _ ->
+        FormInput(title = titleState.text, note = noteState.text, onTitleChange = {
+            viewModel.onTitleValueChange(it)
+        }, onNoteChange = {
+            viewModel.onNoteContentValueChange(it)
+        })
     }
 }
 
 @ExperimentalComposeUiApi
 @Composable
 fun FormInput(
+    modifier: Modifier = Modifier.fillMaxWidth(),
     title: String = "",
     note: String = "",
     onTitleChange: (String) -> Unit,
-    onNoteChange: (String) -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth()
+    onNoteChange: (String) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = modifier
     ) {
-        TransparentTextField(
-            value = title,
+        TransparentTextField(value = title,
             onValueChange = onTitleChange,
             modifier = modifier,
             hintTitle = "Title",
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             textStyle = MaterialTheme.typography.h6,
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusRequester.requestFocus()
-                }
-            )
-        )
-        TransparentTextField(
-            modifier = modifier
-                .fillMaxHeight()
-                .focusRequester(focusRequester),
+            keyboardActions = KeyboardActions(onNext = {
+                focusRequester.requestFocus()
+            }))
+        TransparentTextField(modifier = modifier
+            .fillMaxHeight()
+            .focusRequester(focusRequester),
             value = note,
             onValueChange = onNoteChange,
             hintTitle = "Note",
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardController?.hide()
-                }
-            )
-        )
+            keyboardActions = KeyboardActions(onDone = {
+                keyboardController?.hide()
+            }))
     }
 }
